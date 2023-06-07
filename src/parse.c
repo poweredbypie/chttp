@@ -4,14 +4,15 @@
 
 HttpRequest parseRequest(const Slice* buf) {
     HttpRequest req;
-    
+
     char* verb_end = strstr(buf->buf, " ");
     Slice verb = sliceFrom(buf->buf, verb_end - buf->buf + 1);
     verb.buf[verb.size - 1] = 0;
 
     if (strstr(verb.buf, "GET")) {
         req.verb = GET;
-    } else if (strstr(verb.buf, "POST")) {
+    }
+    else if (strstr(verb.buf, "POST")) {
         req.verb = POST;
     }
     else {

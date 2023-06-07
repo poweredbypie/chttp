@@ -1,13 +1,12 @@
-#include <WinSock2.h>
-#include <WS2tcpip.h>
-
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
-
-#include "router.h"
 #include "parse.h"
+#include "router.h"
 #include "shared.h"
+
+#include <WS2tcpip.h>
+#include <WinSock2.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void initWinSock() {
     WSADATA data;
@@ -18,13 +17,12 @@ void initWinSock() {
 }
 
 typedef struct addrinfo AddrInfo;
+
 AddrInfo* getAddrInfo(const char* port) {
-    AddrInfo hints = {
-        .ai_family = AF_INET,
-        .ai_socktype = SOCK_STREAM,
-        .ai_protocol = IPPROTO_TCP,
-        .ai_flags = AI_PASSIVE
-    };
+    AddrInfo hints = { .ai_family = AF_INET,
+                       .ai_socktype = SOCK_STREAM,
+                       .ai_protocol = IPPROTO_TCP,
+                       .ai_flags = AI_PASSIVE };
 
     AddrInfo* res;
 
@@ -38,6 +36,7 @@ AddrInfo* getAddrInfo(const char* port) {
 }
 
 typedef SOCKET Socket;
+
 Socket initSocket(AddrInfo* info) {
     Socket sock = socket(info->ai_family, info->ai_socktype, info->ai_protocol);
     if (sock == INVALID_SOCKET) {
@@ -67,10 +66,7 @@ Socket initSocket(AddrInfo* info) {
 
 void handleRequest(Socket request) {
     int recvLen = 512;
-    Slice buf = {
-        .buf = NULL,
-        .size = 0
-    };
+    Slice buf = { .buf = NULL, .size = 0 };
     while (1) {
         buf.buf = morph(char, buf.buf, recvLen);
         buf.size = recvLen;

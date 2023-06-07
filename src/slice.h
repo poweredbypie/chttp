@@ -12,9 +12,6 @@ Slice sliceFrom(const char* str, size_t size);
 Slice sliceClone(const Slice* slice);
 
 #define mkslice(str) \
-(Slice){ \
-    .buf = str, \
-    .size = sizeof(str) \
-}
+    (Slice) { .buf = str, .size = sizeof(str) }
 
 #endif

@@ -1,15 +1,18 @@
 #include "router.h"
+
 #include "shared.h"
 
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
 
-const Slice template = mkslice("\
+const Slice template = mkslice(
+    "\
 HTTP/1.0 200 OK\n\
 Server: My Server Is Better Than BlobKat's v0.0.1\n\
-");
+"
+);
 
 const Slice root = mkslice("root/");
 
@@ -39,10 +42,7 @@ Slice routerGetPage(Slice path) {
     FILE* file = fopen(filepath.buf, "r");
 
     if (file == NULL) {
-        Slice ret = {
-            .buf = NULL,
-            .size = 0
-        };
+        Slice ret = { .buf = NULL, .size = 0 };
         return ret;
     }
 

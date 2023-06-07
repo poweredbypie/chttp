@@ -1,7 +1,7 @@
+#include "router.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "router.h"
 
 int main() {
     Slice root = routerGetPage(mkslice("index.html"));
