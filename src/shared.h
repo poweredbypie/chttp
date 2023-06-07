@@ -1,26 +1,17 @@
 #ifndef SHARED_H
 #define SHARED_H
 
+#include "slice.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
-void die(const char* err, int code);
-
-typedef struct {
-    char* buf;
-    size_t size;
-} Slice;
-
-Slice slice_sprintf(const char* fmt, ...);
-
-void slice_append(Slice* dest, const Slice* src);
-
-void slice_from(const char* str);
-
-#define mkslice(str) \
-(Slice){ \
-    .buf = str, \
-    .size = sizeof(str) \
+inline void die(const char* err, int code) {
+    fprintf(stderr, "%s", err);
+    exit(code);
 }
+
+#define alloc(type, size) (type*)malloc(size)
+#define morph(type, buf, size) (type*)realloc(buf, size)
 
 #endif

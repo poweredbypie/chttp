@@ -1,9 +1,14 @@
-chttp: src/main.c src/router.c src/parse.c src/shared.c
-	clang $^ -o $@ -lws2_32 -g -fsanitize=address
+CFLAGS := -g -fsanitize=address
+CC := clang
 
-test: src/test.c src/router.c
-	clang $^ -o $@ -g -Wincompatible-pointer-types-discards-qualifiers -fsanitize=address
+build/chttp: src/main.c src/router.c src/parse.c src/slice.c
+	mkdir -p build
+	$(CC) $^ -o $@ -lws2_32 $(CFLAGS)
+
+build/test: src/test.c src/router.c
+	mkdir -p build
+	$(CC) $^ -o $@ $(CFLAGS)
 
 .PHONY: run
-run: chttp
-	./chttp
+run: build/chttp
+	./$<

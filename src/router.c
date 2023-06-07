@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "router.h"
 #include "shared.h"
 
@@ -7,48 +6,34 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-const char template[] = "\
+const Slice template = mkslice("\
 HTTP/1.0 200 OK\n\
 Server: My Server Is Better Than BlobKat's v0.0.1\n\
-";
+");
 
 const Slice root = mkslice("root/");
 
 Slice getFileContents(FILE* file) {
+    Slice buf;
     const int old = ftell(file);
     fseek(file, 0, SEEK_END);
-    const int length = ftell(file);
+    buf.size = ftell(file);
     fseek(file, old, SEEK_SET);
 
-    char* buf = malloc(length + 1);
-    fread(buf, 1, length, file);
-    buf[length] = 0;
+    buf.buf = alloc(char, buf.size + 1);
+    fread(buf.buf, 1, buf.size, file);
+    buf.buf[buf.size] = 0;
 
-    Slice contents = {
-        .buf = buf,
-        .size = length
-    };
-    return contents;
+    return buf;
 }
 
 Slice routerGetPage(Slice path) {
     // Copy over the template
-    Slice buf = {
-        .buf = malloc(sizeof(template)),
-        .size = sizeof(template)
-    };
-    memcpy(buf.buf, template, buf.size - 1);
-    buf.buf[buf.size - 1] = 0;
+    Slice buf = sliceClone(&template);
 
     // Add root/ to the front of the path
-    Slice filepath = {
-        .buf = NULL,
-        .size = root.size
-    };
-    filepath.buf = malloc(filepath.size);
-    memcpy(filepath.buf, root.buf, root.size);
-    filepath.buf[root.size - 1] = 0;
-    slice_append(&filepath, &path);
+    Slice filepath = sliceClone(&root);
+    sliceAdd(&filepath, &path);
 
     // Actually open the file
     FILE* file = fopen(filepath.buf, "r");
@@ -75,18 +60,18 @@ Slice routerGetPage(Slice path) {
     }
     free(filepath.buf);
 
-    Slice filetype = slice_sprintf("Content-Type: %s; charset=utf-8\n", filetype_str);
+    Slice filetype = sliceFmt("Content-Type: %s; charset=utf-8\n", filetype_str);
     printf("%s", filetype.buf);
     filetype.size--;
-    slice_append(&buf, &filetype);
+    sliceAdd(&buf, &filetype);
     free(filetype.buf);
 
-    Slice size = slice_sprintf("Content-Length: %llu\n\n", contents.size);
+    Slice size = sliceFmt("Content-Length: %llu\n\n", contents.size);
     size.size--;
-    slice_append(&buf, &size);
+    sliceAdd(&buf, &size);
     free(size.buf);
 
-    slice_append(&buf, &contents);
+    sliceAdd(&buf, &contents);
     buf.buf[buf.size - 1] = 0;
     free(contents.buf);
 

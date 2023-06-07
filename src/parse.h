@@ -19,7 +19,7 @@ typedef struct {
     Slice path;
 } HttpRequest;
 
-HttpRequest parseRequest(char* buf);
+HttpRequest parseRequest(const Slice* buf);
 void freeRequest(HttpRequest* req);
 
 #endif

@@ -66,23 +66,23 @@ Socket initSocket(AddrInfo* info) {
 }
 
 void handleRequest(Socket request) {
-    enum {
-        DEFAULT_BUF_LEN = 512
+    int recvLen = 512;
+    Slice buf = {
+        .buf = NULL,
+        .size = 0
     };
-    int recvLen = 0;
-    size_t buf_len = DEFAULT_BUF_LEN;
-    char* buf = NULL;
     while (1) {
-        buf = realloc(buf, buf_len);
+        buf.buf = morph(char, buf.buf, recvLen);
+        buf.size = recvLen;
 
         int recvLen = 0;
-        recvLen = recv(request, buf, buf_len, 0);
+        recvLen = recv(request, buf.buf, buf.size, 0);
         if (recvLen == WSAEMSGSIZE) {
             recvLen += 512;
             continue;
         }
         if (recvLen > 0) {
-            HttpRequest req = parseRequest(buf);
+            HttpRequest req = parseRequest(&buf);
             printf("Path %s (type %d)\n", req.path.buf, req.verb);
 
             Slice page;
@@ -122,7 +122,7 @@ void handleRequest(Socket request) {
         die("Couldn't finalize request", WSAGetLastError());
     }
     printf("Finished handling request\n");
-    free(buf);
+    free(buf.buf);
 }
 
 void handleRequests(Socket sock) {
