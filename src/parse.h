@@ -3,6 +3,8 @@
 
 #include "shared.h"
 
+#include <stdint.h>
+
 typedef enum {
     GET,
     HEAD,
@@ -13,6 +15,8 @@ typedef enum {
     TRACE,
     PATCH
 } HttpVerb;
+
+typedef uint16_t HttpStatus;
 
 typedef struct {
     HttpVerb verb;

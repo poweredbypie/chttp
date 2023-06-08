@@ -7,12 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-const Slice template = mkslice(
-    "\
-HTTP/1.0 200 OK\n\
-Server: My Server Is Better Than BlobKat's v0.0.1\n\
-"
-);
+const Slice template = mkslice("HTTP/1.1 ");
 
 const Slice root = mkslice("root/");
 
@@ -30,7 +25,7 @@ Slice getFileContents(FILE* file) {
     return buf;
 }
 
-Slice routerGetPage(Slice path) {
+Slice routerGetPage(Slice path, HttpStatus status) {
     // Copy over the template
     Slice buf = sliceClone(&template);
 
@@ -45,6 +40,25 @@ Slice routerGetPage(Slice path) {
         Slice ret = { .buf = NULL, .size = 0 };
         return ret;
     }
+
+    Slice status_str;
+    switch (status) {
+    case 200:
+        status_str = mkslice("200 OK\n");
+        break;
+    case 404:
+        status_str = mkslice("404 Not Found\n");
+        break;
+    default:
+        status_str = mkslice("418 I'm a teapot\n");
+        break;
+    }
+    status_str.size--;
+    sliceAdd(&buf, &status_str);
+
+    Slice server_str = mkslice("Server: My Server Is Better Than BlobKat's v0.0.1\n");
+    server_str.size--;
+    sliceAdd(&buf, &server_str);
 
     Slice contents = getFileContents(file);
     fclose(file);

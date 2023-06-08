@@ -84,15 +84,15 @@ void handleRequest(Socket request) {
             Slice page;
             // Special case for root - get index.html
             if (strcmp(req.path.buf, "/") == 0) {
-                page = routerGetPage(mkslice("index.html"));
+                page = routerGetPage(mkslice("index.html"), 200);
             }
             else {
-                page = routerGetPage(req.path);
+                page = routerGetPage(req.path, 200);
             }
 
             // If we couldn't find the page,
             if (page.buf == NULL) {
-                page = routerGetPage(mkslice("404.html"));
+                page = routerGetPage(mkslice("404.html"), 404);
             }
 
             int sendLen = send(request, page.buf, page.size - 1, 0);
